@@ -29,7 +29,7 @@ namespace ProductApi.Data
 
         Product IRepository<Product>.Get(int id)
         {
-            return db.Products.FirstOrDefault(p => p.Id == id);
+            return db.Products.FirstOrDefault(p => p.ProductId == id);
         }
 
         IEnumerable<Product> IRepository<Product>.GetAll()
@@ -39,7 +39,7 @@ namespace ProductApi.Data
 
         void IRepository<Product>.Remove(int id)
         {
-            var product = db.Products.FirstOrDefault(p => p.Id == id);
+            var product = db.Products.FirstOrDefault(p => p.ProductId == id);
             db.Products.Remove(product);
             db.SaveChanges();
         }

@@ -60,7 +60,7 @@ namespace OrderApi.Controllers
                 // reduce the number of items in stock for the ordered product,
                 // and create a new order.
                 orderedProduct.ItemsReserved += order.Quantity;
-                var updateRequest = new RestRequest(orderedProduct.Id.ToString());
+                var updateRequest = new RestRequest(orderedProduct.ProductId.ToString());
                 updateRequest.AddJsonBody(orderedProduct);
                 var updateResponse = c.PutAsync(updateRequest);
                 updateResponse.Wait();
@@ -69,7 +69,7 @@ namespace OrderApi.Controllers
                 {
                     var newOrder = repository.Add(order);
                     return CreatedAtRoute("GetOrder",
-                        new { id = newOrder.Id }, newOrder);
+                        new { id = newOrder.OrderId }, newOrder);
                 }
             }
 

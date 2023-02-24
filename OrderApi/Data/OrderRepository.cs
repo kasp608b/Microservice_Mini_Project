@@ -33,7 +33,7 @@ namespace OrderApi.Data
 
         Order IRepository<Order>.Get(int id)
         {
-            return db.Orders.FirstOrDefault(o => o.Id == id);
+            return db.Orders.FirstOrDefault(o => o.OrderId == id);
         }
 
         IEnumerable<Order> IRepository<Order>.GetAll()
@@ -43,7 +43,7 @@ namespace OrderApi.Data
 
         void IRepository<Order>.Remove(int id)
         {
-            var order = db.Orders.FirstOrDefault(p => p.Id == id);
+            var order = db.Orders.FirstOrDefault(p => p.OrderId == id);
             db.Orders.Remove(order);
             db.SaveChanges();
         }
