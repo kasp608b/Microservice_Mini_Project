@@ -25,6 +25,35 @@ namespace OrderApi.Controllers
             return repository.GetAll();
         }
 
+        /// <summary>
+        /// Update order status
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="order"></param>
+        /// <returns></returns>
+        [HttpPut("{id}")]
+        public IActionResult Put(int id, [FromBody] Order order)
+        {
+            if (order == null || order.ProductId != id)
+            {
+                return BadRequest();
+            }
+
+            var modifiedOrder = repository.Get(id);
+
+            if (modifiedOrder == null)
+            {
+                return NotFound();
+            }
+
+            modifiedOrder.Status = order.Status;
+
+
+            repository.Edit(modifiedOrder);
+            return new NoContentResult();
+        }
+
+
         // GET orders/5
         [HttpGet("{id}", Name = "GetOrder")]
         public IActionResult Get(int id)

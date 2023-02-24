@@ -5,6 +5,7 @@
         completed,
         cancelled,
         shipped,
-        paid
+        paid,
+        proccesing
     }
 }
