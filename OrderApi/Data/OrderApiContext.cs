@@ -10,6 +10,13 @@ namespace OrderApi.Data
         {
         }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            
+        }
+
         public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderLine> Orderlines { get; set; }
+
     }
 }
