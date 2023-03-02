@@ -18,10 +18,10 @@ namespace OrderApi.Data
             {
                 return;   // DB has been seeded
             }
-
+            
             List<Order> orders = new List<Order>
             {
-                new Order { Date = DateTime.Today, ProductId = 1, Quantity = 2 , Status = OrderStatus.proccesing}
+                new Order { Date = DateTime.Today, Status = OrderStatus.proccesing}
             };
 
             context.Orders.AddRange(orders);
