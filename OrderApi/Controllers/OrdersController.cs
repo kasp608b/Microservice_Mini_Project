@@ -17,7 +17,7 @@ namespace OrderApi.Controllers
         public OrdersController(IRepository<Order> repos)
         {
             repository = repos;
-            client = new RestClient("https://localhost:44396");
+            client = new RestClient("http://productapi");
         }
 
         // GET: orders
