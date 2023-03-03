@@ -64,14 +64,15 @@ namespace ProductApi.Controllers
             {
                 return NotFound();
             }
-
+            /*
             modifiedProduct.Name = product.Name;
             modifiedProduct.Category = product.Category;
             modifiedProduct.Price = product.Price;
             modifiedProduct.ItemsInStock = product.ItemsInStock;
             modifiedProduct.ItemsReserved = product.ItemsReserved;
+            */
 
-            repository.Edit(modifiedProduct);
+            repository.Edit(product);
             return new NoContentResult();
         }
 
