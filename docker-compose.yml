@@ -6,10 +6,16 @@ services:
     build:
       context: .
       dockerfile: OrderApi/Dockerfile
+    ports:
+      - 9000:80
+      - 9001:443
 
   productapi:
     image: ${DOCKER_REGISTRY-}productapi
     build:
       context: .
       dockerfile: ProductApi/Dockerfile
+    ports:
+      - 9002:80
+      - 9003:443
 

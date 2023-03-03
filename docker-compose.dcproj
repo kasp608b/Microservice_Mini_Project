@@ -5,8 +5,9 @@
     <DockerTargetOS>Linux</DockerTargetOS>
     <ProjectGuid>ed48c062-f327-42cb-9f74-dd59eb01fe54</ProjectGuid>
     <DockerLaunchAction>LaunchBrowser</DockerLaunchAction>
-    <DockerServiceUrl>{Scheme}://localhost:{ServicePort}/weatherforecast</DockerServiceUrl>
+    <DockerServiceUrl>{Scheme}://localhost:{ServicePort}/swagger</DockerServiceUrl>
     <DockerServiceName>orderapi</DockerServiceName>
+    <DockerServiceName>productapi</DockerServiceName>
   </PropertyGroup>
   <ItemGroup>
     <None Include="docker-compose.override.yml">
