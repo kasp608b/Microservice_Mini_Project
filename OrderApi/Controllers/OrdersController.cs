@@ -107,6 +107,9 @@ namespace OrderApi.Controllers
                         return NoContent();
                     }
                 }
+                else {
+                    return BadRequest("Items in stock is less than the number of items ordered");
+                }
 
             }
 
