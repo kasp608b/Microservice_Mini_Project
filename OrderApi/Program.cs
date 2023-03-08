@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using OrderApi.Data;
-using OrderApi.Models;
+using SharedModels;
 
 var builder = WebApplication.CreateBuilder(args);
 

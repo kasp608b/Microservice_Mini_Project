@@ -22,4 +22,10 @@
   <ItemGroup>
     <None Remove="Swashbuckle.AspNetCore" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Models\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\SharedModels\SharedModels.csproj" />
+  </ItemGroup>
 </Project>

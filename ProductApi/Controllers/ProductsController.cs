@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using ProductApi.Data;
 using ProductApi.Models;
+using SharedModels;
 
 namespace ProductApi.Controllers
 {
@@ -51,9 +52,9 @@ namespace ProductApi.Controllers
 
         // PUT products/5
         [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody]Product product)
+        public IActionResult Put(int id, [FromBody]ProductDto productDto)
         {
-            if (product == null || product.ProductId != id)
+            if (productDto == null || productDto.ProductId != id)
             {
                 return BadRequest();
             }
@@ -65,11 +66,11 @@ namespace ProductApi.Controllers
                 return NotFound();
             }
             
-            modifiedProduct.Name = product.Name;
-            modifiedProduct.Category = product.Category;
-            modifiedProduct.Price = product.Price;
-            modifiedProduct.ItemsInStock = product.ItemsInStock;
-            modifiedProduct.ItemsReserved = product.ItemsReserved;
+            modifiedProduct.Name = productDto.Name;
+            modifiedProduct.Category = modifiedProduct.Category;
+            modifiedProduct.Price = productDto.Price;
+            modifiedProduct.ItemsInStock = productDto.ItemsInStock;
+            modifiedProduct.ItemsReserved = productDto.ItemsReserved;
             
 
             repository.Edit(modifiedProduct);

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using OrderApi.Data;
-using OrderApi.Models;
+using SharedModels;
 using RestSharp;
 
 namespace OrderApi.Controllers
@@ -86,7 +86,7 @@ namespace OrderApi.Controllers
                 // before you can run the request.
                 //RestClient c = new RestClient("https://localhost:5001/products/");
                 var request = new RestRequest("/products/" + orderline.ProductId.ToString());
-                var response = client.GetAsync<Product>(request);
+                var response = client.GetAsync<ProductDto>(request);
                 response.Wait();
                 var orderedProduct = response.Result;
 
