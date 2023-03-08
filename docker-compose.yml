@@ -19,3 +19,13 @@ services:
       - 9002:80
       - 9003:443
 
+
+  customerapi:
+    image: ${DOCKER_REGISTRY-}customerapi
+    build:
+      context: .
+      dockerfile: CustomerApi/Dockerfile
+    ports:
+      - 9004:80
+      - 9005:443
+

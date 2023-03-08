@@ -24,7 +24,7 @@ namespace OrderApi.Data
             db.SaveChanges();
             return newOrder;
         }
-
+        
         void IRepository<Order>.Edit(Order entity)
         {
             db.Entry(entity).State = EntityState.Modified;
