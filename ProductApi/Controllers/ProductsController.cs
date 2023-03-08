@@ -22,9 +22,15 @@ namespace ProductApi.Controllers
 
         // GET products
         [HttpGet]
-        public IEnumerable<Product> Get()
+        public IEnumerable<ProductDto> Get()
         {
-            return repository.GetAll();
+            var productDtoList = new List<ProductDto>();
+            foreach (var product in repository.GetAll())
+            {
+                var productDto = productConverter.Convert(product);
+                productDtoList.Add(productDto);
+            }
+            return productDtoList;
         }
 
         // GET products/5
@@ -36,7 +42,9 @@ namespace ProductApi.Controllers
             {
                 return NotFound();
             }
-            return new ObjectResult(item);
+
+            var productDto = productConverter.Convert(item);
+            return new ObjectResult(productDto);
         }
 
         // POST products
