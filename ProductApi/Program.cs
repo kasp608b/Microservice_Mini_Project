@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using ProductApi.Data;
 using ProductApi.Models;
+using SharedModels;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +14,9 @@ builder.Services.AddScoped<IRepository<Product>, ProductRepository>();
 
 // Register database initializer for dependency injection
 builder.Services.AddTransient<IDbInitializer, DbInitializer>();
+
+// Register ProductConverter for dependency injection
+builder.Services.AddSingleton<IConverter<Product, ProductDto>, ProductConverter>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using ProductApi.Data;
 using ProductApi.Models;
@@ -11,10 +12,12 @@ namespace ProductApi.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly IRepository<Product> repository;
+        private IConverter<Product, ProductDto> productConverter;
 
-        public ProductsController(IRepository<Product> repos)
+        public ProductsController(IRepository<Product> repos, IConverter<Product, ProductDto> converter)
         {
             repository = repos;
+            productConverter = converter;
         }
 
         // GET products
@@ -38,13 +41,14 @@ namespace ProductApi.Controllers
 
         // POST products
         [HttpPost]
-        public IActionResult Post([FromBody]Product product)
+        public IActionResult Post([FromBody] ProductDto productDto)
         {
-            if (product == null)
+            if (productDto == null)
             {
                 return BadRequest();
             }
 
+            var product = productConverter.Convert(productDto);
             var newProduct = repository.Add(product);
 
             return CreatedAtRoute("GetProduct", new { id = newProduct.ProductId }, newProduct);
