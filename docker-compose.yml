@@ -16,6 +16,9 @@ services:
     build:
       context: .
       dockerfile: OrderApi/Dockerfile
+    depends_on:
+       rabbitmq:
+        condition: service_started
     ports:
       - 9000:80
       - 9001:443
@@ -25,6 +28,9 @@ services:
     build:
       context: .
       dockerfile: ProductApi/Dockerfile
+    depends_on:
+       rabbitmq:
+        condition: service_started
     ports:
       - 9002:80
       - 9003:443
@@ -35,6 +41,9 @@ services:
     build:
       context: .
       dockerfile: CustomerApi/Dockerfile
+    depends_on:
+       rabbitmq:
+        condition: service_started
     ports:
       - 9004:80
       - 9005:443
