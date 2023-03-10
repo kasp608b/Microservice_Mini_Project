@@ -59,7 +59,7 @@ namespace ProductApi.Controllers
             var product = productConverter.Convert(productDto);
             var newProduct = repository.Add(product);
 
-            return CreatedAtRoute("GetProduct", new { id = newProduct.ProductId }, newProduct);
+            return CreatedAtRoute("GetProduct", new { id = newProduct.ProductId }, productConverter.Convert(newProduct));
         }
 
         // PUT products/5

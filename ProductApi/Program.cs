@@ -2,8 +2,14 @@ using Microsoft.EntityFrameworkCore;
 using ProductApi.Data;
 using ProductApi.Models;
 using SharedModels;
+using System;
+using System.Configuration;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
+
+string cloudAMQPConnectionString = "host=rabbitmq";
 
 // Add services to the container.
 
