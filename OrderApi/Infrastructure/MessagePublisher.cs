@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using EasyNetQ;
+﻿using EasyNetQ;
 using SharedModels;
 
 namespace OrderApi.Infrastructure
@@ -22,11 +20,11 @@ namespace OrderApi.Infrastructure
         public void PublishOrderStatusChangedMessage(int? customerId, List<OrderLine> orderLines, string topic)
         {
             var message = new OrderStatusChangedMessage
-            { 
+            {
                 CustomerId = customerId,
-                OrderLines = orderLines 
+                OrderLines = orderLines
             };
-
+            Console.WriteLine(message + "message published" + topic);
             bus.PubSub.Publish(message, topic);
         }
 

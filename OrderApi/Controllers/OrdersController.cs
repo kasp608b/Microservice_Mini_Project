@@ -74,6 +74,8 @@ namespace OrderApi.Controllers
         [HttpPost]
         public IActionResult Post([FromBody] Order order)
         {
+            Console.WriteLine("Order post called");
+
             if (order == null)
             {
                 return BadRequest();
