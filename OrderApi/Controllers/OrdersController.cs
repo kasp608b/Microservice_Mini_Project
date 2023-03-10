@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using OrderApi.Data;
+using OrderApi.Infrastructure;
 using SharedModels;
-using RestSharp;
 
 namespace OrderApi.Controllers
 {
@@ -11,13 +9,17 @@ namespace OrderApi.Controllers
     [Route("[controller]")]
     public class OrdersController : ControllerBase
     {
-        private readonly IRepository<Order> repository;
-        public RestClient client;
+        IOrderRepository repository;
+        IServiceGateway<ProductDto> productServiceGateway;
+        IMessagePublisher messagePublisher;
 
-        public OrdersController(IRepository<Order> repos)
+        public OrdersController(IRepository<Order> repos,
+            IServiceGateway<ProductDto> gateway,
+            IMessagePublisher publisher)
         {
-            repository = repos;
-            client = new RestClient("http://productapi");
+            repository = repos as IOrderRepository;
+            productServiceGateway = gateway;
+            messagePublisher = publisher;
         }
 
         // GET: orders
@@ -70,56 +72,85 @@ namespace OrderApi.Controllers
 
         // POST orders
         [HttpPost]
-        public IActionResult Post([FromBody]Order order)
+        public IActionResult Post([FromBody] Order order)
         {
             if (order == null)
             {
                 return BadRequest();
             }
 
-            foreach (var orderline in order.Orderlines)
+            if (ProductItemsAvailable(order))
             {
-
-
-                // Call ProductApi to get the product ordered
-                // You may need to change the port number in the BaseUrl below
-                // before you can run the request.
-                //RestClient c = new RestClient("https://localhost:5001/products/");
-                var request = new RestRequest("/products/" + orderline.ProductId.ToString());
-                var response = client.GetAsync<ProductDto>(request);
-                response.Wait();
-                var orderedProduct = response.Result;
-
-
-
-                if (orderline.NoOfItems <= orderedProduct.ItemsInStock - orderedProduct.ItemsReserved)
+                try
                 {
-                    // reduce the number of items in stock for the ordered product,
-                    // and create a new order.
-                    orderedProduct.ItemsReserved += orderline.NoOfItems;
-                    var updateRequest = new RestRequest("/products/" + orderedProduct.ProductId.ToString());
-                    updateRequest.AddJsonBody(orderedProduct);
-                    var updateResponse = client.PutAsync(updateRequest);
-                    updateResponse.Wait();
+                    // Publish OrderStatusChangedMessage. If this operation
+                    // fails, the order will not be created
+                    messagePublisher.PublishOrderStatusChangedMessage(
+                        order.CustomerId, order.Orderlines, "completed");
 
-                    if (!updateResponse.IsCompletedSuccessfully)
-                    {
-                        return NoContent();
-                    }
+                    // Create order.
+                    order.Status = OrderStatus.completed;
+                    var newOrder = repository.Add(order);
+                    return CreatedAtRoute("GetOrder", new { id = newOrder.OrderId }, newOrder);
                 }
-                else {
-                    return BadRequest("Items in stock is less than the number of items ordered");
+                catch
+                {
+                    return StatusCode(500, "An error happened. Try again.");
                 }
-
             }
-
-            var newOrder = repository.Add(order);
-            return CreatedAtRoute("GetOrder",
-                new { id = newOrder.OrderId }, newOrder);
-
-            // If the order could not be created, "return no content".
-            //return NoContent();
+            else
+            {
+                // If there are not enough product items available.
+                return StatusCode(500, "Not enough items in stock.");
+            }
         }
 
+        private bool ProductItemsAvailable(Order order)
+        {
+            foreach (var orderLine in order.Orderlines)
+            {
+                // Call product service to get the product ordered.
+                var orderedProduct = productServiceGateway.Get(orderLine.ProductId);
+                if (orderLine.NoOfItems > orderedProduct.ItemsInStock - orderedProduct.ItemsReserved)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // PUT orders/5/cancel
+        // This action method cancels an order and publishes an OrderStatusChangedMessage
+        // with topic set to "cancelled".
+        [HttpPut("{id}/cancel")]
+        public IActionResult Cancel(int id)
+        {
+            throw new NotImplementedException();
+
+            // Add code to implement this method.
+        }
+
+        // PUT orders/5/ship
+        // This action method ships an order and publishes an OrderStatusChangedMessage.
+        // with topic set to "shipped".
+        [HttpPut("{id}/ship")]
+        public IActionResult Ship(int id)
+        {
+            throw new NotImplementedException();
+
+            // Add code to implement this method.
+        }
+
+        // PUT orders/5/pay
+        // This action method marks an order as paid and publishes a CreditStandingChangedMessage
+        // (which have not yet been implemented), if the credit standing changes.
+        [HttpPut("{id}/pay")]
+        public IActionResult Pay(int id)
+        {
+            throw new NotImplementedException();
+
+            // Add code to implement this method.
+        }
     }
+
 }

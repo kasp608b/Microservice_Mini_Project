@@ -6,7 +6,7 @@ using System;
 
 namespace OrderApi.Data
 {
-    public class OrderRepository : IRepository<Order>
+    public class OrderRepository : IOrderRepository
     {
         private readonly OrderApiContext db;
 
@@ -39,6 +39,15 @@ namespace OrderApi.Data
         IEnumerable<Order> IRepository<Order>.GetAll()
         {
             return db.Orders.Include(o => o.Orderlines).ToList();
+        }
+
+        public IEnumerable<Order> GetByCustomer(int customerId)
+        {
+            var ordersForCustomer = from o in db.Orders
+                                    where o.CustomerId == customerId
+                                    select o;
+
+            return ordersForCustomer.ToList();
         }
 
         void IRepository<Order>.Remove(int id)

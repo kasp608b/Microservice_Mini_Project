@@ -24,7 +24,13 @@ namespace OrderApi.Data
                 new Order { Date = DateTime.Today, Status = OrderStatus.proccesing}
             };
 
+            List<OrderLine> orderLines = new List<OrderLine>
+            {
+                 new OrderLine {OrderId = 1, NoOfItems = 5, ProductId = 1},
+            };
+
             context.Orders.AddRange(orders);
+            context.Orderlines.AddRange(orderLines);
             context.SaveChanges();
         }
     }
