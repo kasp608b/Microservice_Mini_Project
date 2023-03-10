@@ -3,8 +3,6 @@ using ProductApi.Data;
 using ProductApi.Infrastructure;
 using ProductApi.Models;
 using SharedModels;
-using System;
-using System.Configuration;
 
 
 
@@ -37,8 +35,8 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 //if (app.Environment.IsDevelopment())
 //{
-    app.UseSwagger();
-    app.UseSwaggerUI();
+app.UseSwagger();
+app.UseSwaggerUI();
 //}
 
 // Initialize the database.
@@ -50,6 +48,7 @@ using (var scope = app.Services.CreateScope())
     dbInitializer.Initialize(dbContext);
 }
 // Create a message listener in a separate thread.
+Console.WriteLine("Started listening program");
 Task.Factory.StartNew(() =>
     new MessageListener(app.Services, cloudAMQPConnectionString).Start());
 //app.UseHttpsRedirection();

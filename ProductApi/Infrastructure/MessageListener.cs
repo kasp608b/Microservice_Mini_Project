@@ -23,7 +23,7 @@ namespace ProductApi.Infrastructure
         {
             using (var bus = RabbitHutch.CreateBus(connectionString))
             {
-                
+
                 Console.WriteLine("Started Listening on " + connectionString + "Fuck Fuck");
 
                 bus.PubSub.Subscribe<OrderStatusChangedMessage>("productApiHkCompleted",
