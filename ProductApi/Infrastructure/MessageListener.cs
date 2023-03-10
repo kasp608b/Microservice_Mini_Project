@@ -23,7 +23,9 @@ namespace ProductApi.Infrastructure
         {
             using (var bus = RabbitHutch.CreateBus(connectionString))
             {
-                Console.WriteLine("Subscribing to productApiHkCompleted");
+                
+                Console.WriteLine("Started Listening on " + connectionString + "Fuck Fuck");
+
                 bus.PubSub.Subscribe<OrderStatusChangedMessage>("productApiHkCompleted",
                     HandleOrderCompleted, x => x.WithTopic("completed"));
 
@@ -53,6 +55,8 @@ namespace ProductApi.Infrastructure
             // also be disposed.
             using (var scope = provider.CreateScope())
             {
+
+                Console.WriteLine("Revieces Order Completed Message");
                 var services = scope.ServiceProvider;
                 var productRepos = services.GetService<IRepository<Product>>();
 
