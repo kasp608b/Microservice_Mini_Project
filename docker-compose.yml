@@ -1,6 +1,10 @@
 version: '3.4'
 
 services:
+  rabbitmq:
+   image: rabbitmq:3-management
+   ports:
+     - "15673:15672"
   orderapi:
     image: ${DOCKER_REGISTRY-}orderapi
     build:
@@ -8,6 +12,7 @@ services:
       dockerfile: OrderApi/Dockerfile
     ports:
       - 9000:80
+      - 9001:443
 
   productapi:
     image: ${DOCKER_REGISTRY-}productapi
@@ -15,7 +20,8 @@ services:
       context: .
       dockerfile: ProductApi/Dockerfile
     ports:
-      - 9001:80
+      - 9002:80
+      - 9003:443
 
 
   customerapi:
@@ -24,5 +30,6 @@ services:
       context: .
       dockerfile: CustomerApi/Dockerfile
     ports:
-      - 9002:80
+      - 9004:80
+      - 9005:443
 
