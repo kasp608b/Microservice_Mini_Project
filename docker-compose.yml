@@ -3,6 +3,11 @@ version: '3.4'
 services:
   rabbitmq:
    image: rabbitmq:3-management
+   volumes:
+      - ./rabbitmq/etc/definitions.json:/etc/rabbitmq/definitions.json
+      - ./rabbitmq/etc/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+      - ./rabbitmq/data:/var/lib/rabbitmq/mnesia/rabbit@my-rabbit
+      - ./rabbitmq/logs:/var/log/rabbitmq/log
    ports:
      - "15673:15672"
   orderapi:
