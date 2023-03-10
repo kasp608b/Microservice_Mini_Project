@@ -23,6 +23,7 @@ namespace ProductApi.Infrastructure
         {
             using (var bus = RabbitHutch.CreateBus(connectionString))
             {
+                Console.WriteLine("Subscribing to productApiHkCompleted");
                 bus.PubSub.Subscribe<OrderStatusChangedMessage>("productApiHkCompleted",
                     HandleOrderCompleted, x => x.WithTopic("completed"));
 

@@ -10,6 +10,8 @@ using System.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//string cloudAMQPConnectionString = "host=hawk-01.rmq.cloudamqp.com;virtualHost=npaprqop;username=npaprqop;password=type your password here";
+
 string cloudAMQPConnectionString = "host=rabbitmq";
 
 // Add services to the container.
