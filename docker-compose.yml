@@ -10,6 +10,7 @@ services:
       - ./rabbitmq/logs:/var/log/rabbitmq/log
    ports:
      - "15673:15672"
+     - "5672:5672" 
   orderapi:
     image: ${DOCKER_REGISTRY-}orderapi
     build:
