@@ -24,7 +24,7 @@ namespace ProductApi.Infrastructure
             using (var bus = RabbitHutch.CreateBus(connectionString))
             {
 
-                Console.WriteLine("Started Listening on " + connectionString + "Fuck Fuck");
+                Console.WriteLine("Started Listening on " + connectionString + " ");
 
                 bus.PubSub.Subscribe<OrderStatusChangedMessage>("productApiHkCompleted",
                     HandleOrderCompleted, x => x.WithTopic("completed"));
@@ -50,6 +50,7 @@ namespace ProductApi.Infrastructure
 
         private void HandleOrderCompleted(OrderStatusChangedMessage message)
         {
+            Console.WriteLine("Handle order completed called");
             // A service scope is created to get an instance of the product repository.
             // When the service scope is disposed, the product repository instance will
             // also be disposed.
