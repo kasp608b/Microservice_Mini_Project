@@ -404,3 +404,5 @@ ASALocalRun/
 # Local History for Visual Studio
 .localhistory/
 ProductApi/App.config
+CustomerApi/App.config
+OrderApi/App.config
