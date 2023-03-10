@@ -8,7 +8,6 @@ services:
       dockerfile: OrderApi/Dockerfile
     ports:
       - 9000:80
-      - 9001:443
 
   productapi:
     image: ${DOCKER_REGISTRY-}productapi
@@ -16,8 +15,7 @@ services:
       context: .
       dockerfile: ProductApi/Dockerfile
     ports:
-      - 9002:80
-      - 9003:443
+      - 9001:80
 
 
   customerapi:
@@ -26,6 +24,5 @@ services:
       context: .
       dockerfile: CustomerApi/Dockerfile
     ports:
-      - 9004:80
-      - 9005:443
+      - 9002:80
 
