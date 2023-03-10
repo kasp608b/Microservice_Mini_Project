@@ -406,3 +406,4 @@ ASALocalRun/
 ProductApi/App.config
 CustomerApi/App.config
 OrderApi/App.config
+SharedModels/App.config
