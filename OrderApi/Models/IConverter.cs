@@ -1,4 +1,4 @@
-﻿namespace OrderApi
+﻿namespace OrderApi.Models
 {
     public interface IConverter<T, U>
     {

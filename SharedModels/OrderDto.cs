@@ -7,6 +7,10 @@
         public int CustomerId { get; set; }
         public List<OrderLineDto> Orderlines { get; set; }
 
+        public OrderDto()
+        {
+            Orderlines = new List<OrderLineDto>();
+        }
 
 
 

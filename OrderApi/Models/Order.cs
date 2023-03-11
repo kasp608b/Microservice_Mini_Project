@@ -8,9 +8,10 @@
         public int CustomerId { get; set; }
         public List<OrderLine> Orderlines { get; set; }
 
-
-
-
+        public Order()
+        {
+            Orderlines = new List<OrderLine>();
+        }
     }
 }
  
