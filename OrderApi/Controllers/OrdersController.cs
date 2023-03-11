@@ -166,9 +166,20 @@ namespace OrderApi.Controllers
         [HttpPut("{id}/ship")]
         public IActionResult Ship(int id)
         {
-            throw new NotImplementedException();
+            //Check if the order exists
+            var item = repository.Get(id);
+            if (item == null)
+            {
+                return NotFound();
+            }
 
-            // Add code to implement this method.
+            item.Status = OrderStatus.shipped;
+
+            repository.Edit(item);
+            // Publish OrderStatusChangedMessage
+            messagePublisher.PublishOrderStatusChangedMessage(
+                item.CustomerId, OrderConverter.Convert(item).Orderlines, "shipped");
+            return new NoContentResult();
         }
 
         // PUT orders/5/pay
@@ -177,9 +188,41 @@ namespace OrderApi.Controllers
         [HttpPut("{id}/pay")]
         public IActionResult Pay(int id)
         {
-            throw new NotImplementedException();
+            //Check if the order exists
+            var item = repository.Get(id);
+            if (item == null)
+            {
+                return NotFound();
+            }
 
-            // Add code to implement this method.
+            item.Status = OrderStatus.paid;
+
+            repository.Edit(item);
+
+            //Check if the customers credit standing has changed
+            //If it has changed, publish a CreditStandingChangedMessage
+
+            if (CreditStandingHasChanged(item.CustomerId))
+            { 
+                // Publish CreditStandingChangedMessage
+                messagePublisher.PublishCreditStandingChangedMessage(item.CustomerId, true);
+            }
+
+
+
+            
+            
+            return new NoContentResult();
+        }
+        
+        //Check if the customers credit standing has changed
+        private bool CreditStandingHasChanged(int customerId)
+        {
+            //If any of the customers orders are shipped then that mens that the customer still has bad creadit standing
+            //And so his credit standing has not changed
+            return !repository.GetByCustomer(customerId).Any(o => o.Status == OrderStatus.shipped);
+
+
         }
     }
 
