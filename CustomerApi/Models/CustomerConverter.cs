@@ -2,9 +2,9 @@
 
 namespace CustomerApi.Models
 {
-    public class CustomerConverter : IConverter<Customer, CustomerDTO>
+    public class CustomerConverter : IConverter<Customer, CustomerDto>
     {
-        public Customer Convert(CustomerDTO sharedCustomer)
+        public Customer Convert(CustomerDto sharedCustomer)
         {
             return new Customer
             {
@@ -19,9 +19,9 @@ namespace CustomerApi.Models
             };
         }
 
-        public CustomerDTO Convert(Customer hiddenCustomer)
+        public CustomerDto Convert(Customer hiddenCustomer)
         {
-            return new CustomerDTO
+            return new CustomerDto
             {
                 CustomerId = hiddenCustomer.CustomerId,
                 Name = hiddenCustomer.Name,

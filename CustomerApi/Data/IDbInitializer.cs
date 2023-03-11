@@ -2,6 +2,6 @@
 {
     public interface IDbInitializer
     {
-        void Initialize(OrderApiContext context);
+        void Initialize(CustomerApiContext context);
     }
 }

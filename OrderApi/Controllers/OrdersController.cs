@@ -17,8 +17,8 @@ namespace OrderApi.Controllers
 
         public OrdersController(IRepository<Order> repos,
             IServiceGateway<ProductDto> gateway,
-            IMessagePublisher publisher ,
-            IConverter<Order,OrderDto> orderconverter
+            IMessagePublisher publisher,
+            IConverter<Order, OrderDto> orderconverter
             )
         {
             repository = repos as IOrderRepository;
@@ -84,27 +84,27 @@ namespace OrderApi.Controllers
 
         // POST orders
         [HttpPost]
-        public IActionResult Post([FromBody] Order order)
+        public IActionResult Post([FromBody] OrderDto orderDto)
         {
             Console.WriteLine("Order post called");
 
-            if (order == null)
+            if (orderDto == null)
             {
                 return BadRequest();
             }
 
-            if (ProductItemsAvailable(order))
+            if (ProductItemsAvailable(orderDto))
             {
                 try
                 {
                     // Publish OrderStatusChangedMessage. If this operation
                     // fails, the order will not be created
                     messagePublisher.PublishOrderStatusChangedMessage(
-                        order.CustomerId, OrderConverter.Convert(order).Orderlines, "completed");
+                        orderDto.CustomerId, OrderConverter.Convert(orderDto).Orderlines, "completed");
 
                     // Create order.
-                    order.Status = OrderStatus.completed;
-                    var newOrder = repository.Add(order);
+                    orderDto.Status = OrderStatus.completed;
+                    var newOrder = repository.Add(orderDto);
                     var orderDto = OrderConverter.Convert(newOrder);
                     return CreatedAtRoute("GetOrder", new { id = orderDto.OrderId }, orderDto);
                 }

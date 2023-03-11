@@ -1,7 +1,7 @@
 ﻿
 namespace SharedModels
 {
-    public class CustomerDTO
+    public class CustomerDto
     {
         public int CustomerId { get; set; }
 
