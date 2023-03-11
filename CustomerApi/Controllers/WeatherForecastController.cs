@@ -1,3 +1,4 @@
+using CustomerApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CustomerApi.Controllers
@@ -6,8 +7,8 @@ namespace CustomerApi.Controllers
     [Route("[controller]")]
     public class CustomerController : ControllerBase
     {
-        private readonly IRepository<Product> repository;
-        private IConverter<Product, ProductDto> productConverter;
+        private readonly IRepository<Customer> repository;
+        private readonly IConverter<Customer, CustomerDto> customerConverter;
 
         public CustomerController(IRepository<Customer> repos, IConverter<Customer, CustomerDto> converter)
         {
