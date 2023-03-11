@@ -58,7 +58,7 @@ namespace CustomerApi.Controllers
             return CreatedAtRoute("GetCustomer", new { id = newcustomer.CustomerId }, customerConverter.Convert(newcustomer));
         }
 
-        // PUT products/5
+        // PUT customer/5
         [HttpPut("{id}")]
         public IActionResult Put(int id, [FromBody] CustomerDto customerDto)
         {
@@ -74,13 +74,13 @@ namespace CustomerApi.Controllers
                 return NotFound();
             }
 
-            modifiedCustomer.Name = CustomerDto.Name;
-            modifiedCustomer.Email = CustomerDto.Email;
-            modifiedCustomer.Phone = CustomerDto.Phone;
-            modifiedCustomer.BillingAddress = CustomerDto.BillingAddress
-            modifiedCustomer.ShippingAddress = CustomerDto.ShippingAddress;
-            modifiedCustomer.ShippingAddress = CustomerDto.ShippingAddress;
-            modifiedCustomer.CreditStanding = CustomerDto.CreditStanding;
+            modifiedCustomer.Name = customerDto.Name;
+            modifiedCustomer.Email = customerDto.Email;
+            modifiedCustomer.Phone = customerDto.Phone;
+            modifiedCustomer.BillingAddress = customerDto.BillingAddress
+            modifiedCustomer.ShippingAddress = customerDto.ShippingAddress;
+            modifiedCustomer.ShippingAddress = customerDto.ShippingAddress;
+            modifiedCustomer.CreditStanding = customerDto.CreditStanding;
 
 
             repository.Edit(modifiedCustomer);
