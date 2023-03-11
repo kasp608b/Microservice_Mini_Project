@@ -9,7 +9,8 @@ namespace CustomerApi.Models
             return new Customer
             {
                 CustomerId = sharedCustomer.CustomerId,
-                Name = sharedCustomer.Name,
+                CompanyName = sharedCustomer.CompanyName,
+                RegistrationNumber = sharedCustomer.RegistrationNumber,
                 Email = sharedCustomer.Email,
                 Phone = sharedCustomer.Phone,
                 BillingAddress = sharedCustomer.BillingAddress,
@@ -24,7 +25,7 @@ namespace CustomerApi.Models
             return new CustomerDto
             {
                 CustomerId = hiddenCustomer.CustomerId,
-                Name = hiddenCustomer.Name,
+                CompanyName = hiddenCustomer.CompanyName,
                 Email = hiddenCustomer.Email,
                 Phone = hiddenCustomer.Phone,
                 BillingAddress = hiddenCustomer.BillingAddress,

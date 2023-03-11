@@ -34,8 +34,9 @@ namespace CustomerApi.Data
         private Faker<Customer> createCustomerRuleset()
         {
             return new Faker<Customer>()
-           .RuleFor(c => c.Name, (f, c) => f.Name.FullName())
-           .RuleFor(c => c.Email, (f, c) => f.Internet.Email(c.Name))
+           .RuleFor(c => c.CompanyName, (f, c) => f.Company.CompanyName())
+           .RuleFor(c => c.RegistrationNumber, (f, c) => f.Commerce.Ean13())
+           .RuleFor(c => c.Email, (f, c) => f.Internet.Email(c.CompanyName))
            .RuleFor(c => c.Phone, (f, c) => f.Phone.PhoneNumber())
            .RuleFor(c => c.BillingAddress, (f, c) => f.Address.FullAddress())
            .RuleFor(c => c.ShippingAddress, (f, c) => f.Address.FullAddress())

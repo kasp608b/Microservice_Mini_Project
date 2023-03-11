@@ -1,8 +1,5 @@
-﻿using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
+﻿using Microsoft.EntityFrameworkCore;
 using SharedModels;
-using System;
 
 namespace OrderApi.Data
 {
@@ -19,12 +16,12 @@ namespace OrderApi.Data
         {
             if (entity.Date == null)
                 entity.Date = DateTime.Now;
-            
+
             var newOrder = db.Orders.Add(entity).Entity;
             db.SaveChanges();
             return newOrder;
         }
-        
+
         void IRepository<Order>.Edit(Order entity)
         {
             db.Entry(entity).State = EntityState.Modified;
@@ -43,7 +40,7 @@ namespace OrderApi.Data
 
         public IEnumerable<Order> GetByCustomer(int customerId)
         {
-            var ordersForCustomer = from o in db.Orders
+            var ordersForCustomer = from o in db.Orders.Include(o => o.Orderlines)
                                     where o.CustomerId == customerId
                                     select o;
 
