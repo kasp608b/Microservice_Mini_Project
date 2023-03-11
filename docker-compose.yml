@@ -10,7 +10,13 @@ services:
       - ./rabbitmq/logs:/var/log/rabbitmq/log
    ports:
      - "15673:15672"
-     - "5672:5672" 
+     - "5672:5672"
+   healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:15672"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+
   orderapi:
     image: ${DOCKER_REGISTRY-}orderapi
     build:
@@ -18,7 +24,7 @@ services:
       dockerfile: OrderApi/Dockerfile
     depends_on:
        rabbitmq:
-        condition: service_started
+        condition: service_healthy
     ports:
       - 9000:80
       - 9001:443
@@ -30,7 +36,7 @@ services:
       dockerfile: ProductApi/Dockerfile
     depends_on:
        rabbitmq:
-        condition: service_started
+        condition: service_healthy
     ports:
       - 9002:80
       - 9003:443
@@ -43,7 +49,7 @@ services:
       dockerfile: CustomerApi/Dockerfile
     depends_on:
        rabbitmq:
-        condition: service_started
+        condition: service_healthy
     ports:
       - 9004:80
       - 9005:443
