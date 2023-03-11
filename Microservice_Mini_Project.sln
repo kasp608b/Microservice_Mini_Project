@@ -15,6 +15,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "rabbit", "rabbit", "{ECB52180-412E-44AA-9ECB-4869554C1E73}"
 	ProjectSection(SolutionItems) = preProject
 		..\..\..\..\Downloads\definitions.json = ..\..\..\..\Downloads\definitions.json
+		rabbit\Dockerfile = rabbit\Dockerfile
 	EndProjectSection
 EndProject
 Global

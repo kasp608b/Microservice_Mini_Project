@@ -3,6 +3,9 @@ version: '3.4'
 services:
   rabbitmq:
    image: rabbitmq:3-management
+   build:
+      context: .
+      dockerfile: rabbit/Dockerfile
    volumes:
       - ./rabbitmq/etc/definitions.json:/etc/rabbitmq/definitions.json
       - ./rabbitmq/etc/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
@@ -13,7 +16,7 @@ services:
      - "5672:5672"
    healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:15672"]
-      interval: 10s
+      interval: 30s
       timeout: 10s
       retries: 5
 
@@ -22,9 +25,14 @@ services:
     build:
       context: .
       dockerfile: OrderApi/Dockerfile
+    environment:
+      - HOSTNAMERABBIT=rabbitmq
+    restart: on-failure 
     depends_on:
        rabbitmq:
         condition: service_healthy
+    links: 
+        - rabbitmq
     ports:
       - 9000:80
       - 9001:443
@@ -34,9 +42,14 @@ services:
     build:
       context: .
       dockerfile: ProductApi/Dockerfile
+    environment:
+      - HOSTNAMERABBIT=rabbitmq
+    restart: on-failure 
     depends_on:
        rabbitmq:
         condition: service_healthy
+    links: 
+        - rabbitmq
     ports:
       - 9002:80
       - 9003:443
@@ -47,9 +60,14 @@ services:
     build:
       context: .
       dockerfile: CustomerApi/Dockerfile
+    environment:
+      - HOSTNAMERABBIT=rabbitmq
+    restart: on-failure 
     depends_on:
        rabbitmq:
         condition: service_healthy
+    links: 
+        - rabbitmq
     ports:
       - 9004:80
       - 9005:443
