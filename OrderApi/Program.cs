@@ -32,8 +32,8 @@ builder.Services.AddScoped<IRepository<Order>, OrderRepository>();
 // Register database initializer for dependency injection
 builder.Services.AddTransient<IDbInitializer, DbInitializer>();
 
-// Register OrderCOnverter for dependency injection
-builder.Services.AddTransient<IConverter<Order,OrderDto>, OrderConverter>();
+// Register OrderConverter for dependency injection
+builder.Services.AddSingleton<IConverter<Order, OrderDto>, OrderConverter>();
 
 
 // Register product service gateway for dependency injection
@@ -53,11 +53,11 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+//if (app.Environment.IsDevelopment())
+//{
+app.UseSwagger();
+app.UseSwaggerUI();
+//}
 
 // Initialize the database.
 using (var scope = app.Services.CreateScope())
