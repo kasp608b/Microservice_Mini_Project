@@ -93,20 +93,22 @@ namespace OrderApi.Controllers
                 return BadRequest();
             }
 
-            if (ProductItemsAvailable(orderDto))
+            var order = OrderConverter.Convert(orderDto);
+
+            if (ProductItemsAvailable(order))
             {
                 try
                 {
                     // Publish OrderStatusChangedMessage. If this operation
                     // fails, the order will not be created
                     messagePublisher.PublishOrderStatusChangedMessage(
-                        orderDto.CustomerId, OrderConverter.Convert(orderDto).Orderlines, "completed");
+                        order.CustomerId, OrderConverter.Convert(order).Orderlines, "completed");
 
                     // Create order.
-                    orderDto.Status = OrderStatus.completed;
-                    var newOrder = repository.Add(orderDto);
-                    var orderDto = OrderConverter.Convert(newOrder);
-                    return CreatedAtRoute("GetOrder", new { id = orderDto.OrderId }, orderDto);
+                    order.Status = OrderStatus.completed;
+                    var newOrder = repository.Add(order);
+                    var neworderDto = OrderConverter.Convert(newOrder);
+                    return CreatedAtRoute("GetOrder", new { id = neworderDto.OrderId }, neworderDto);
                 }
                 catch
                 {
