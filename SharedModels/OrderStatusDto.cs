@@ -1,6 +1,6 @@
 ﻿namespace SharedModels
 {
-    public enum OrderStatus
+    public enum OrderStatusDto
     {
         completed,
         cancelled,
