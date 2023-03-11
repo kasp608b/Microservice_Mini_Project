@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using OrderApi.Data;
 using OrderApi.Infrastructure;
+using OrderApi.Models;
 using SharedModels;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,6 +31,9 @@ builder.Services.AddScoped<IRepository<Order>, OrderRepository>();
 
 // Register database initializer for dependency injection
 builder.Services.AddTransient<IDbInitializer, DbInitializer>();
+
+// Register OrderCOnverter for dependency injection
+builder.Services.AddTransient<IConverter<Order,OrderDto>, OrderConverter>();
 
 
 // Register product service gateway for dependency injection

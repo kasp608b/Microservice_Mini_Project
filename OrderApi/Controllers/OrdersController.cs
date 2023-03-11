@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using OrderApi.Data;
 using OrderApi.Infrastructure;
+using OrderApi.Models;
 using SharedModels;
 
 namespace OrderApi.Controllers
@@ -12,21 +13,31 @@ namespace OrderApi.Controllers
         IOrderRepository repository;
         IServiceGateway<ProductDto> productServiceGateway;
         IMessagePublisher messagePublisher;
+        private readonly IConverter<Order, OrderDto> OrderConverter;
 
         public OrdersController(IRepository<Order> repos,
             IServiceGateway<ProductDto> gateway,
-            IMessagePublisher publisher)
+            IMessagePublisher publisher ,
+            IConverter<Order,OrderDto> orderconverter
+            )
         {
             repository = repos as IOrderRepository;
             productServiceGateway = gateway;
             messagePublisher = publisher;
+            OrderConverter = orderconverter;
         }
 
         // GET: orders
         [HttpGet]
-        public IEnumerable<Order> Get()
+        public IEnumerable<OrderDto> Get()
         {
-            return repository.GetAll();
+            var orderDtoList = new List<OrderDto>();
+            foreach (var order in repository.GetAll())
+            {
+                var orderDto = OrderConverter.Convert(order);
+                orderDtoList.Add(orderDto);
+            }
+            return orderDtoList;
         }
 
         /// <summary>
@@ -36,9 +47,9 @@ namespace OrderApi.Controllers
         /// <param name="order"></param>
         /// <returns></returns>
         [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody] Order order)
+        public IActionResult Put(int id, [FromBody] OrderDto orderDto)
         {
-            if (order == null)
+            if (orderDto == null || orderDto.OrderId != id)
             {
                 return BadRequest();
             }
@@ -50,7 +61,7 @@ namespace OrderApi.Controllers
                 return NotFound();
             }
 
-            modifiedOrder.Status = order.Status;
+            modifiedOrder.Status = OrderConverter.Convert(orderDto).Status;
 
 
             repository.Edit(modifiedOrder);
@@ -67,7 +78,8 @@ namespace OrderApi.Controllers
             {
                 return NotFound();
             }
-            return new ObjectResult(item);
+            var orderDto = OrderConverter.Convert(item);
+            return new ObjectResult(orderDto);
         }
 
         // POST orders
@@ -88,12 +100,13 @@ namespace OrderApi.Controllers
                     // Publish OrderStatusChangedMessage. If this operation
                     // fails, the order will not be created
                     messagePublisher.PublishOrderStatusChangedMessage(
-                        order.CustomerId, order.Orderlines, "completed");
+                        order.CustomerId, OrderConverter.Convert(order).Orderlines, "completed");
 
                     // Create order.
                     order.Status = OrderStatus.completed;
                     var newOrder = repository.Add(order);
-                    return CreatedAtRoute("GetOrder", new { id = newOrder.OrderId }, newOrder);
+                    var orderDto = OrderConverter.Convert(newOrder);
+                    return CreatedAtRoute("GetOrder", new { id = orderDto.OrderId }, orderDto);
                 }
                 catch
                 {
