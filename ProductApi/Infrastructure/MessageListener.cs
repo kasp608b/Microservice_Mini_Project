@@ -39,6 +39,8 @@ namespace ProductApi.Infrastructure
                 // get the same subscription id, they will listen on the same
                 // queue.
 
+                
+
                 // Block the thread so that it will not exit and stop subscribing.
                 lock (this)
                 {
