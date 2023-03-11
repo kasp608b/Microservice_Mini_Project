@@ -74,14 +74,10 @@ namespace CustomerApi.Controllers
                 return NotFound();
             }
 
-            modifiedCustomer.Name = customerDto.Name;
             modifiedCustomer.Email = customerDto.Email;
             modifiedCustomer.Phone = customerDto.Phone;
             modifiedCustomer.BillingAddress = customerDto.BillingAddress;
             modifiedCustomer.ShippingAddress = customerDto.ShippingAddress;
-            modifiedCustomer.ShippingAddress = customerDto.ShippingAddress;
-            modifiedCustomer.CreditStanding = customerDto.CreditStanding;
-
 
             repository.Edit(modifiedCustomer);
             return new NoContentResult();
