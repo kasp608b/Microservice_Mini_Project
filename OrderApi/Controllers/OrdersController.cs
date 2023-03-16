@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using OrderApi.Data;
 using OrderApi.Infrastructure;
 using OrderApi.Models;
@@ -168,13 +170,18 @@ namespace OrderApi.Controllers
                 return NotFound();
             }
 
+            if (item.Status == OrderStatus.cancelled)
+            {
+                return StatusCode(400, "Order already cancelled");
+            }
+
             item.Status = OrderStatus.cancelled;
 
             repository.Edit(item);
             // Publish OrderStatusChangedMessage
             messagePublisher.PublishOrderStatusChangedMessage(
                 item.CustomerId, OrderConverter.Convert(item).Orderlines, "cancelled");
-            return new NoContentResult();
+            return StatusCode(200, "Order cancelled");
 
 
         }
@@ -192,13 +199,18 @@ namespace OrderApi.Controllers
                 return NotFound();
             }
 
+            if (item.Status == OrderStatus.shipped)
+            {
+                return StatusCode(400, "Order already shipped");
+            }
+
             item.Status = OrderStatus.shipped;
 
             repository.Edit(item);
             // Publish OrderStatusChangedMessage
             messagePublisher.PublishOrderStatusChangedMessage(
                 item.CustomerId, OrderConverter.Convert(item).Orderlines, "shipped");
-            return new NoContentResult();
+            return StatusCode(200, "Order shipped");
         }
 
         // PUT orders/5/pay
@@ -214,6 +226,11 @@ namespace OrderApi.Controllers
                 return NotFound();
             }
 
+            if (item.Status == OrderStatus.paid)
+            {
+                return StatusCode(400, "Order already paid");
+            }
+
             item.Status = OrderStatus.paid;
 
             repository.Edit(item);
@@ -227,11 +244,7 @@ namespace OrderApi.Controllers
                 messagePublisher.PublishCreditStandingChangedMessage(item.CustomerId, true);
             }
 
-
-
-
-
-            return new NoContentResult();
+            return StatusCode(200, "Order paid");
         }
 
         //Check if the customers credit standing has changed
