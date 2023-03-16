@@ -59,8 +59,6 @@ namespace ProductApi.Infrastructure
             Console.WriteLine("Handle order shipped called");
             using (var scope = provider.CreateScope())
             {
-
-                Console.WriteLine("Revieces Order Cancelled Message");
                 var services = scope.ServiceProvider;
                 var productRepos = services.GetService<IRepository<Product>>();
 
@@ -107,8 +105,6 @@ namespace ProductApi.Infrastructure
             // also be disposed.
             using (var scope = provider.CreateScope())
             {
-
-                Console.WriteLine("Revieces Order Completed Message");
                 var services = scope.ServiceProvider;
                 var productRepos = services.GetService<IRepository<Product>>();
 
