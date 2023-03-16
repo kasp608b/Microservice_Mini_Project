@@ -31,7 +31,11 @@ namespace ProductApi.Infrastructure
 
                 // Add code to subscribe to other OrderStatusChanged events:
                 // * cancelled
+                bus.PubSub.Subscribe<OrderStatusChangedMessage>("productApiHkCancelled",
+                    HandleOrderCancelled, x => x.WithTopic("cancelled"));
                 // * shipped
+                bus.PubSub.Subscribe<OrderStatusChangedMessage>("productApiHkShipped",
+                    HandleOrderShipped, x => x.WithTopic("shipped"));
                 // * paid
                 // Implement an event handler for each of these events.
                 // Be careful that each subscribe has a unique subscription id
@@ -39,12 +43,57 @@ namespace ProductApi.Infrastructure
                 // get the same subscription id, they will listen on the same
                 // queue.
 
-                
+
 
                 // Block the thread so that it will not exit and stop subscribing.
                 lock (this)
                 {
                     Monitor.Wait(this);
+                }
+            }
+
+        }
+
+        private void HandleOrderShipped(OrderStatusChangedMessage message)
+        {
+            Console.WriteLine("Handle order shipped called");
+            using (var scope = provider.CreateScope())
+            {
+
+                Console.WriteLine("Revieces Order Cancelled Message");
+                var services = scope.ServiceProvider;
+                var productRepos = services.GetService<IRepository<Product>>();
+
+                //Remove the reservartion items of ordered product (should be a single transaction).
+                //Remove the Items form the stock of the ordered product (should be a single transaction).
+
+                foreach (var orderLine in message.OrderLines)
+                {
+                    var product = productRepos.Get(orderLine.ProductId);
+                    product.ItemsReserved -= orderLine.NoOfItems;
+                    product.ItemsInStock -= orderLine.NoOfItems;
+                    productRepos.Edit(product);
+                }
+            }
+        }
+
+        private void HandleOrderCancelled(OrderStatusChangedMessage message)
+        {
+            Console.WriteLine("Handle order cancelled called");
+            using (var scope = provider.CreateScope())
+            {
+
+                Console.WriteLine("Revieces Order Cancelled Message");
+                var services = scope.ServiceProvider;
+                var productRepos = services.GetService<IRepository<Product>>();
+
+                //Remove the reservartion items of ordered product (should be a single transaction).
+               
+                foreach (var orderLine in message.OrderLines)
+                {
+                    var product = productRepos.Get(orderLine.ProductId);
+                    product.ItemsReserved -= orderLine.NoOfItems;
+                    productRepos.Edit(product);
                 }
             }
 
