@@ -14,11 +14,13 @@ namespace OrderApi.Controllers
     {
         IOrderRepository repository;
         IServiceGateway<ProductDto> productServiceGateway;
+        IServiceGateway<CustomerDto> _customerGateway;
         IMessagePublisher messagePublisher;
         private readonly IConverter<Order, OrderDto> OrderConverter;
 
         public OrdersController(IRepository<Order> repos,
             IServiceGateway<ProductDto> gateway,
+            IServiceGateway<CustomerDto> customerGateway,
             IMessagePublisher publisher,
             IConverter<Order, OrderDto> orderconverter
             )
@@ -26,6 +28,7 @@ namespace OrderApi.Controllers
             repository = repos as IOrderRepository;
             productServiceGateway = gateway;
             messagePublisher = publisher;
+            _customerGateway = customerGateway;
             OrderConverter = orderconverter;
         }
 
@@ -89,6 +92,13 @@ namespace OrderApi.Controllers
         public IActionResult Post([FromBody] OrderDto orderDto)
         {
             Console.WriteLine("Order post called");
+            var customer = _customerGateway.Get(orderDto.CustomerId);
+
+            Console.WriteLine(customer);
+            if (customer == null)
+            {
+                return BadRequest("The customer  does not exist");
+            }
 
             if (orderDto == null)
             {

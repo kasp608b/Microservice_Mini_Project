@@ -13,6 +13,8 @@ var builder = WebApplication.CreateBuilder(args);
 // the order service).
 string productServiceBaseUrl = "http://productapi/products/";
 
+string customerServiceBaseUrl = "http://customerapi/Customers/";
+
 
 // RabbitMQ connection string (I use CloudAMQP as a RabbitMQ server).
 // Remember to replace this connectionstring with your own.
@@ -39,6 +41,8 @@ builder.Services.AddSingleton<IConverter<Order, OrderDto>, OrderConverter>();
 // Register product service gateway for dependency injection
 builder.Services.AddSingleton<IServiceGateway<ProductDto>>(new
     ProductServiceGateway(productServiceBaseUrl));
+
+builder.Services.AddSingleton<IServiceGateway<CustomerDto>>(new CustomerServiceGateway(customerServiceBaseUrl));
 
 
 // Register MessagePublisher (a messaging gateway) for dependency injection
