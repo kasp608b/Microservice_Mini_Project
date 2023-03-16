@@ -82,6 +82,25 @@ namespace OrderApi.Controllers
             return new ObjectResult(orderDto);
         }
 
+        // GET orders/5
+        [HttpGet("GetByCustomer/{id}", Name = "GetOrderByCustomer")]
+        public IActionResult GetbyCustomer(int id)
+        {
+            var orderDtoList = new List<OrderDto>();
+
+            var orderList = repository.GetByCustomer(id);
+
+            if (orderList.Count() <= 0) return NotFound("No matching orders found");
+
+            foreach (var order in repository.GetByCustomer(id))
+            {
+                var orderDto = OrderConverter.Convert(order);
+                orderDtoList.Add(orderDto);
+            }
+            return Ok(orderDtoList);
+
+        }
+
         // POST orders
         [HttpPost]
         public IActionResult Post([FromBody] OrderDto orderDto)
@@ -203,18 +222,18 @@ namespace OrderApi.Controllers
             //If it has changed, publish a CreditStandingChangedMessage
 
             if (CreditStandingHasChanged(item.CustomerId))
-            { 
+            {
                 // Publish CreditStandingChangedMessage
                 messagePublisher.PublishCreditStandingChangedMessage(item.CustomerId, true);
             }
 
 
 
-            
-            
+
+
             return new NoContentResult();
         }
-        
+
         //Check if the customers credit standing has changed
         private bool CreditStandingHasChanged(int customerId)
         {
