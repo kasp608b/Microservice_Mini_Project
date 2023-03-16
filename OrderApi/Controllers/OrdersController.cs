@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using OrderApi.Data;
 using OrderApi.Infrastructure;
 using OrderApi.Models;
@@ -113,7 +111,7 @@ namespace OrderApi.Controllers
             Console.WriteLine("Order post called");
             var customer = _customerGateway.Get(orderDto.CustomerId);
 
-            
+
             if (customer.CustomerId != orderDto.CustomerId || customer.CustomerId == 0)
             {
                 return BadRequest("The customer  does not exist");
@@ -126,6 +124,9 @@ namespace OrderApi.Controllers
 
             if (!customer.CreditStanding)
             {
+                // Publish OrderRejectedMessage.
+                messagePublisher.PublishOrderRejectedMessage(orderDto, "The customer has outstanding bills");
+
                 return BadRequest("The customer has outstanding bills");
             }
 
@@ -135,24 +136,33 @@ namespace OrderApi.Controllers
             {
                 try
                 {
-                    // Publish OrderStatusChangedMessage. If this operation
-                    // fails, the order will not be created
-                    messagePublisher.PublishOrderStatusChangedMessage(
-                        order.CustomerId, OrderConverter.Convert(order).Orderlines, "completed");
+
 
                     // Create order.
                     order.Status = OrderStatus.completed;
                     var newOrder = repository.Add(order);
                     var neworderDto = OrderConverter.Convert(newOrder);
+
+                    // Publish OrderStatusChangedMessage. If this operation
+                    // fails, the order will not be created
+                    messagePublisher.PublishOrderStatusChangedMessage(
+                        order.CustomerId, neworderDto.Orderlines, "completed");
+
                     return CreatedAtRoute("GetOrder", new { id = neworderDto.OrderId }, neworderDto);
                 }
                 catch
                 {
+
+                    // Publish OrderRejectedMessage.
+                    messagePublisher.PublishOrderRejectedMessage(orderDto, "An error happened. Try again.");
                     return StatusCode(500, "An error happened. Try again.");
                 }
             }
             else
             {
+                // Publish OrderRejectedMessage.
+                messagePublisher.PublishOrderRejectedMessage(orderDto, "Not enough items in stock.");
+
                 // If there are not enough product items available.
                 return StatusCode(500, "Not enough items in stock.");
             }

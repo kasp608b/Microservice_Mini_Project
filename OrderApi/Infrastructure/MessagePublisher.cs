@@ -28,7 +28,7 @@ namespace OrderApi.Infrastructure
             bus.PubSub.Publish(message);
 
         }
-        
+
 
         public void PublishOrderStatusChangedMessage(int? customerId, List<OrderLineDto> orderLines, string topic)
         {
@@ -39,6 +39,17 @@ namespace OrderApi.Infrastructure
             };
             Console.WriteLine(message + "message published" + topic);
             bus.PubSub.Publish(message, topic);
+        }
+
+        public void PublishOrderRejectedMessage(OrderDto order, string messageText)
+        {
+            var message = new OrderRejectedMessage
+            {
+                orderDto = order,
+                message = messageText
+            };
+            Console.WriteLine(message + "message published");
+            bus.PubSub.Publish(message);
         }
 
     }

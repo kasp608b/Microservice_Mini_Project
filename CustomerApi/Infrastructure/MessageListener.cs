@@ -33,6 +33,14 @@ namespace CustomerApi.Infrastructure
                 bus.PubSub.Subscribe<CreditStandingChangedMessage>("customerApiHkCreditStandingChanged",
                     HandleCreditStandingChanged);
 
+                // * order rejected
+                bus.PubSub.Subscribe<OrderRejectedMessage>("customerApiHkOrderRejected",
+                    HandleOrderRejected);
+
+                // * order compleated
+                bus.PubSub.Subscribe<OrderStatusChangedMessage>("customerApiHkCompleted",
+                   HandleOrderCompleted, x => x.WithTopic("completed"));
+
                 // Block the thread so that it will not exit and stop subscribing.
                 lock (this)
                 {
@@ -40,6 +48,85 @@ namespace CustomerApi.Infrastructure
                 }
             }
 
+        }
+
+        private void HandleOrderCompleted(OrderStatusChangedMessage message)
+        {
+            Console.WriteLine("Handle order completed called");
+            using (var scope = provider.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                var emailService = services.GetService<IEmailService>();
+                var customerRepo = services.GetService<ICustomerRepository>();
+                var productServiceGateway = services.GetService<IServiceGateway<ProductDto>>();
+
+
+                if (message.CustomerId != null && customerRepo != null && emailService != null && productServiceGateway != null)
+                {
+                    var customer = customerRepo.Get((int)message.CustomerId);
+
+                    decimal totalPrice = 0;
+
+                    var sb = new System.Text.StringBuilder();
+                    sb.AppendLine($"Dear {customer.CompanyName}");
+                    sb.AppendLine($"Order with order id number: {message.OrderLines[0].OrderId} has been completed.");
+                    sb.AppendLine($"The following is a list of the products and the number of ordered products");
+                    foreach (OrderLineDto orderline in message.OrderLines)
+                    {
+                        var product = productServiceGateway.Get(orderline.ProductId);
+                        sb.AppendLine($"Product name: {product.Name}, Price: {product.Price}, Number of ordered items: {orderline.NoOfItems}");
+
+                        totalPrice += product.Price * orderline.NoOfItems;
+                    }
+
+                    sb.AppendLine($"Total price: {totalPrice}kr.");
+                    sb.AppendLine($"The ordered products will be shipped shortly");
+                    sb.AppendLine($"Have a nice day");
+
+                    emailService.SendEmail(customer.Email, "Order completed", sb.ToString());
+
+                }
+
+            }
+        }
+
+        private void HandleOrderRejected(OrderRejectedMessage message)
+        {
+            Console.WriteLine("Handle order rejected called");
+            using (var scope = provider.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                var emailService = services.GetService<IEmailService>();
+                var customerRepo = services.GetService<ICustomerRepository>();
+                var productServiceGateway = services.GetService<IServiceGateway<ProductDto>>();
+
+
+                if (customerRepo != null && emailService != null && productServiceGateway != null)
+                {
+                    var customer = customerRepo.Get((int)message.orderDto.CustomerId);
+
+                    decimal totalPrice = 0;
+
+                    var sb = new System.Text.StringBuilder();
+                    sb.AppendLine($"Dear {customer.CompanyName}");
+                    sb.AppendLine($"Order with order id number: {message.orderDto.OrderId} has been Rejected.");
+                    sb.AppendLine($"The following is a list of the products and the number of ordered products");
+                    foreach (OrderLineDto orderline in message.orderDto.Orderlines)
+                    {
+                        var product = productServiceGateway.Get(orderline.ProductId);
+                        sb.AppendLine($"Product name: {product.Name}, Price: {product.Price}, Number of ordered items: {orderline.NoOfItems}");
+
+                        totalPrice += product.Price * orderline.NoOfItems;
+                    }
+
+                    sb.AppendLine($"Total price: {totalPrice}kr.");
+                    sb.AppendLine($"The order was rejected because: {message.message}");
+
+                    emailService.SendEmail(customer.Email, "Order rejected", sb.ToString());
+
+                }
+
+            }
         }
 
         private void HandleCreditStandingChanged(CreditStandingChangedMessage message)
