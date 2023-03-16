@@ -1,4 +1,4 @@
-﻿namespace OrderApi.Infrastructure
+﻿namespace CustomerApi.Infrastructure
 {
     public interface IEmailService
     {

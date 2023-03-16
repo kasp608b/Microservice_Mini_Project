@@ -27,6 +27,14 @@ builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 // Register database initializer for dependency injection
 builder.Services.AddTransient<IDbInitializer, DbInitializer>();
 
+
+// Register product service gateway for dependency injection
+builder.Services.AddSingleton<IServiceGateway<ProductDto>>(new
+    ProductServiceGateway(productServiceBaseUrl));
+
+// Regiser email service for dependency injection
+builder.Services.AddScoped<IEmailService, EmailServiceStub>();
+
 // Register CustomerConverter for dependency injection
 builder.Services.AddSingleton<IConverter<Customer, CustomerDto>, CustomerConverter>();
 
@@ -56,6 +64,12 @@ using (var scope = app.Services.CreateScope())
     var dbInitializer = services.GetService<IDbInitializer>();
     dbInitializer.Initialize(dbContext);
 }
+
+// Create a message listener in a separate thread.
+Console.WriteLine("Started listening program");
+Task.Factory.StartNew(() =>
+    new MessageListener(app.Services, cloudAMQPConnectionString).Start());
+//app.UseHttpsRedirection();
 
 //app.UseHttpsRedirection();
 
