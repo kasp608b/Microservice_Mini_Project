@@ -113,8 +113,8 @@ namespace OrderApi.Controllers
             Console.WriteLine("Order post called");
             var customer = _customerGateway.Get(orderDto.CustomerId);
 
-            Console.WriteLine(customer);
-            if (customer == null)
+            
+            if (customer.CustomerId != orderDto.CustomerId || customer.CustomerId == 0)
             {
                 return BadRequest("The customer  does not exist");
             }
@@ -122,6 +122,11 @@ namespace OrderApi.Controllers
             if (orderDto == null)
             {
                 return BadRequest();
+            }
+
+            if (!customer.CreditStanding)
+            {
+                return BadRequest("The customer has outstanding bills");
             }
 
             var order = OrderConverter.Convert(orderDto);
