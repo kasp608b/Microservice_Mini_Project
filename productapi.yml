@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: productapi
-        image: henrikkyhl/productapi:latest
+        image: scupak/productapi:latest
 ---
 apiVersion: v1
 kind: Service
