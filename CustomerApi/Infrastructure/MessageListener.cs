@@ -18,28 +18,38 @@ namespace CustomerApi.Infrastructure
             this.connectionString = connectionString;
         }
 
-        public void Start()
+        public async Task Start()
         {
+            var connectionEstablished = false;
             using (var bus = RabbitHutch.CreateBus(connectionString))
             {
+                while (!connectionEstablished)
+                {
 
-                Console.WriteLine("Started Listening on " + connectionString + " ");
+                    Console.WriteLine("Started Listening on " + connectionString + " ");
 
-                // * shipped
-                bus.PubSub.Subscribe<OrderStatusChangedMessage>("customerApiHkShipped",
-                    HandleOrderShipped, x => x.WithTopic("shipped"));
+                    // * shipped
+                    var subscriptionResult = bus.PubSub.SubscribeAsync<OrderStatusChangedMessage>("customerApiHkShipped",
+                        HandleOrderShipped, x => x.WithTopic("shipped")).AsTask();
 
-                // * credit standing changed
-                bus.PubSub.Subscribe<CreditStandingChangedMessage>("customerApiHkCreditStandingChanged",
-                    HandleCreditStandingChanged);
+                    // * credit standing changed
+                    bus.PubSub.Subscribe<CreditStandingChangedMessage>("customerApiHkCreditStandingChanged",
+                        HandleCreditStandingChanged);
 
-                // * order rejected
-                bus.PubSub.Subscribe<OrderRejectedMessage>("customerApiHkOrderRejected",
-                    HandleOrderRejected);
+                    // * order rejected
+                    bus.PubSub.Subscribe<OrderRejectedMessage>("customerApiHkOrderRejected",
+                        HandleOrderRejected);
 
-                // * order compleated
-                bus.PubSub.Subscribe<OrderStatusChangedMessage>("customerApiHkCompleted",
-                   HandleOrderCompleted, x => x.WithTopic("completed"));
+                    // * order compleated
+                    bus.PubSub.Subscribe<OrderStatusChangedMessage>("customerApiHkCompleted",
+                       HandleOrderCompleted, x => x.WithTopic("completed"));
+                    
+                    await subscriptionResult.WaitAsync(CancellationToken.None);
+                    connectionEstablished = subscriptionResult.Status == TaskStatus.RanToCompletion;
+                    if (!connectionEstablished) Thread.Sleep(1000);
+                }
+
+                Console.WriteLine("connectionEstablished= " + connectionEstablished);
 
                 // Block the thread so that it will not exit and stop subscribing.
                 lock (this)
