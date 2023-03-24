@@ -18,6 +18,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "rabbit", "rabbit", "{ECB521
 		rabbit\Dockerfile = rabbit\Dockerfile
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Kubernetes", "Kubernetes", "{C127E5BB-8E00-41AD-AA83-AF875A2E119D}"
+	ProjectSection(SolutionItems) = preProject
+		kubernetes\customerapi.yml = kubernetes\customerapi.yml
+		kubernetes\orderapi.yml = kubernetes\orderapi.yml
+		kubernetes\productapi.yml = kubernetes\productapi.yml
+		kubernetes\rabbitmq.yml = kubernetes\rabbitmq.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
