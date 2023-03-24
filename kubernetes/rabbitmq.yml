@@ -39,5 +39,5 @@ spec:
     app: rabbitmq
   ports:
   - port: 15672
-    nodePort: 15673
+    nodePort: 31004
 
