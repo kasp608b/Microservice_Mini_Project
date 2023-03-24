@@ -19,37 +19,52 @@ namespace ProductApi.Infrastructure
             this.connectionString = connectionString;
         }
 
-        public void Start()
+        public async Task StartAsync()
         {
-            using (var bus = RabbitHutch.CreateBus(connectionString))
+            //Implement the functionality for the method to try to connect again if the connection fails.
+            var connectionEstablished = false;
+
+            
+                using (var bus = RabbitHutch.CreateBus(connectionString))
+                {
+                
+                while (!connectionEstablished)
             {
 
-                Console.WriteLine("Started Listening on " + connectionString + " ");
 
-                bus.PubSub.Subscribe<OrderStatusChangedMessage>("productApiHkCompleted",
-                    HandleOrderCompleted, x => x.WithTopic("completed"));
+                    Console.WriteLine("Started Listening on " + connectionString + " ");
 
-                // Add code to subscribe to other OrderStatusChanged events:
-                // * cancelled
-                bus.PubSub.Subscribe<OrderStatusChangedMessage>("productApiHkCancelled",
-                    HandleOrderCancelled, x => x.WithTopic("cancelled"));
-                // * shipped
-                bus.PubSub.Subscribe<OrderStatusChangedMessage>("productApiHkShipped",
-                    HandleOrderShipped, x => x.WithTopic("shipped"));
-                // * paid
-                // Implement an event handler for each of these events.
-                // Be careful that each subscribe has a unique subscription id
-                // (this is the first parameter to the Subscribe method). If they
-                // get the same subscription id, they will listen on the same
-                // queue.
+                    var subscriptionResult = bus.PubSub.SubscribeAsync<OrderStatusChangedMessage>("productApiHkCompleted",
+                        HandleOrderCompleted, x => x.WithTopic("completed")).AsTask();
 
+                    // Add code to subscribe to other OrderStatusChanged events:
+                    // * cancelled
+                    bus.PubSub.Subscribe<OrderStatusChangedMessage>("productApiHkCancelled",
+                        HandleOrderCancelled, x => x.WithTopic("cancelled"));
+                    // * shipped
+                    bus.PubSub.Subscribe<OrderStatusChangedMessage>("productApiHkShipped",
+                        HandleOrderShipped, x => x.WithTopic("shipped"));
+                    // * paid
+                    // Implement an event handler for each of these events.
+                    // Be careful that each subscribe has a unique subscription id
+                    // (this is the first parameter to the Subscribe method). If they
+                    // get the same subscription id, they will listen on the same
+                    // queue.
 
+                    await subscriptionResult.WaitAsync(CancellationToken.None);
+                    connectionEstablished = subscriptionResult.Status == TaskStatus.RanToCompletion;
+                    if (!connectionEstablished) Thread.Sleep(1000);
+                }
 
+                Console.WriteLine("connectionEstablished= " + connectionEstablished);
                 // Block the thread so that it will not exit and stop subscribing.
                 lock (this)
-                {
-                    Monitor.Wait(this);
-                }
+                    {
+                        Monitor.Wait(this);
+                    }
+
+                    
+                
             }
 
         }

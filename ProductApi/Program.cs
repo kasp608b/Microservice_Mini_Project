@@ -50,7 +50,7 @@ using (var scope = app.Services.CreateScope())
 // Create a message listener in a separate thread.
 Console.WriteLine("Started listening program");
 Task.Factory.StartNew(() =>
-    new MessageListener(app.Services, cloudAMQPConnectionString).Start());
+    new MessageListener(app.Services, cloudAMQPConnectionString).StartAsync());
 //app.UseHttpsRedirection();
 
 app.UseAuthorization();
