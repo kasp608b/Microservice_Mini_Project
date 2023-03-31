@@ -36,6 +36,11 @@ namespace CustomerApi.Infrastructure
                     bus.PubSub.Subscribe<CreditStandingChangedMessage>("customerApiHkCreditStandingChanged",
                         HandleCreditStandingChanged);
 
+
+                    // * cancelled
+                    bus.PubSub.Subscribe<OrderStatusChangedMessage>("productApiHkCancelled",
+                        HandleOrderCancelled, x => x.WithTopic("cancelled"));
+
                     // * order rejected
                     bus.PubSub.Subscribe<OrderRejectedMessage>("customerApiHkOrderRejected",
                         HandleOrderRejected);
@@ -43,7 +48,7 @@ namespace CustomerApi.Infrastructure
                     // * order compleated
                     bus.PubSub.Subscribe<OrderStatusChangedMessage>("customerApiHkCompleted",
                        HandleOrderCompleted, x => x.WithTopic("completed"));
-                    
+
                     await subscriptionResult.WaitAsync(CancellationToken.None);
                     connectionEstablished = subscriptionResult.Status == TaskStatus.RanToCompletion;
                     if (!connectionEstablished) Thread.Sleep(1000);
@@ -58,6 +63,31 @@ namespace CustomerApi.Infrastructure
                 }
             }
 
+        }
+
+        private void HandleOrderCancelled(OrderStatusChangedMessage message)
+        {
+            Console.WriteLine("Handle order completed called");
+            using (var scope = provider.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                var emailService = services.GetService<IEmailService>();
+                var customerRepo = services.GetService<ICustomerRepository>();
+
+                if (message.CustomerId != null && customerRepo != null && emailService != null)
+                {
+                    var customer = customerRepo.Get((int)message.CustomerId);
+
+                    var sb = new System.Text.StringBuilder();
+                    sb.AppendLine($"Dear {customer.CompanyName}");
+                    sb.AppendLine($"Order with order id number: {message.OrderLines[0].OrderId} has been cancelled.");
+                    sb.AppendLine($"Have a nice day");
+
+                    emailService.SendEmail(customer.Email, "Order cancelled", sb.ToString());
+
+                }
+
+            }
         }
 
         private void HandleOrderCompleted(OrderStatusChangedMessage message)

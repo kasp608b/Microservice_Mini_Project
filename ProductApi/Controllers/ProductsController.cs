@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using ProductApi.Data;
 using ProductApi.Models;
 using SharedModels;
@@ -22,84 +20,128 @@ namespace ProductApi.Controllers
 
         // GET products
         [HttpGet]
-        public IEnumerable<ProductDto> Get()
+        public IActionResult Get()
         {
-            var productDtoList = new List<ProductDto>();
-            foreach (var product in repository.GetAll())
+            try
             {
-                var productDto = productConverter.Convert(product);
-                productDtoList.Add(productDto);
+                var productDtoList = new List<ProductDto>();
+                foreach (var product in repository.GetAll())
+                {
+                    var productDto = productConverter.Convert(product);
+                    productDtoList.Add(productDto);
+                }
+                return new ObjectResult(productDtoList);
+
             }
-            return productDtoList;
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Something went wrong" + $"{ex.Message}");
+            }
+
         }
 
         // GET products/5
-        [HttpGet("{id}", Name="GetProduct")]
+        [HttpGet("{id}", Name = "GetProduct")]
         public IActionResult Get(int id)
         {
-            var item = repository.Get(id);
-            if (item == null)
+            try
             {
-                return NotFound();
-            }
+                var item = repository.Get(id);
+                if (item == null)
+                {
+                    return NotFound();
+                }
 
-            var productDto = productConverter.Convert(item);
-            return new ObjectResult(productDto);
+                var productDto = productConverter.Convert(item);
+                return new ObjectResult(productDto);
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Something went wrong" + $"{ex.Message}");
+            }
         }
 
         // POST products
         [HttpPost]
         public IActionResult Post([FromBody] ProductDto productDto)
         {
-            if (productDto == null)
+            try
             {
-                return BadRequest();
+                if (productDto == null)
+                {
+                    return BadRequest();
+                }
+
+                var product = productConverter.Convert(productDto);
+                var newProduct = repository.Add(product);
+
+                return CreatedAtRoute("GetProduct", new { id = newProduct.ProductId }, productConverter.Convert(newProduct));
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Something went wrong" + $"{ex.Message}");
             }
 
-            var product = productConverter.Convert(productDto);
-            var newProduct = repository.Add(product);
-
-            return CreatedAtRoute("GetProduct", new { id = newProduct.ProductId }, productConverter.Convert(newProduct));
         }
 
         // PUT products/5
         [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody]ProductDto productDto)
+        public IActionResult Put(int id, [FromBody] ProductDto productDto)
         {
-            if (productDto == null || productDto.ProductId != id)
+            try
             {
-                return BadRequest();
+                if (productDto == null || productDto.ProductId != id)
+                {
+                    return BadRequest();
+                }
+
+                var modifiedProduct = repository.Get(id);
+
+                if (modifiedProduct == null)
+                {
+                    return NotFound();
+                }
+
+                modifiedProduct.Name = productDto.Name;
+                modifiedProduct.Category = modifiedProduct.Category;
+                modifiedProduct.Price = productDto.Price;
+                modifiedProduct.ItemsInStock = productDto.ItemsInStock;
+                modifiedProduct.ItemsReserved = productDto.ItemsReserved;
+
+
+                repository.Edit(modifiedProduct);
+                return new NoContentResult();
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Something went wrong" + $"{ex.Message}");
             }
 
-            var modifiedProduct = repository.Get(id);
-
-            if (modifiedProduct == null)
-            {
-                return NotFound();
-            }
-            
-            modifiedProduct.Name = productDto.Name;
-            modifiedProduct.Category = modifiedProduct.Category;
-            modifiedProduct.Price = productDto.Price;
-            modifiedProduct.ItemsInStock = productDto.ItemsInStock;
-            modifiedProduct.ItemsReserved = productDto.ItemsReserved;
-            
-
-            repository.Edit(modifiedProduct);
-            return new NoContentResult();
         }
 
         // DELETE products/5
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            if (repository.Get(id) == null)
+            try
             {
-                return NotFound();
+                if (repository.Get(id) == null)
+                {
+                    return NotFound();
+                }
+
+                repository.Remove(id);
+                return new NoContentResult();
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Something went wrong" + $"{ex.Message}");
             }
 
-            repository.Remove(id);
-            return new NoContentResult();
         }
     }
 }

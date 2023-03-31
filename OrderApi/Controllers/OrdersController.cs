@@ -32,15 +32,24 @@ namespace OrderApi.Controllers
 
         // GET: orders
         [HttpGet]
-        public IEnumerable<OrderDto> Get()
+        public IActionResult Get()
         {
-            var orderDtoList = new List<OrderDto>();
-            foreach (var order in repository.GetAll())
+            try
             {
-                var orderDto = OrderConverter.Convert(order);
-                orderDtoList.Add(orderDto);
+                var orderDtoList = new List<OrderDto>();
+                foreach (var order in repository.GetAll())
+                {
+                    var orderDto = OrderConverter.Convert(order);
+                    orderDtoList.Add(orderDto);
+                }
+
+                return new ObjectResult(orderDtoList);
+
             }
-            return orderDtoList;
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Something went wrong" + $"{ex.Message}");
+            }
         }
 
         /// <summary>
@@ -67,7 +76,16 @@ namespace OrderApi.Controllers
             modifiedOrder.Status = OrderConverter.Convert(orderDto).Status;
 
 
-            repository.Edit(modifiedOrder);
+            try
+            {
+                repository.Edit(modifiedOrder);
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Something went wrong" + $"{ex.Message}");
+            }
+
             return new NoContentResult();
         }
 
@@ -76,7 +94,18 @@ namespace OrderApi.Controllers
         [HttpGet("{id}", Name = "GetOrder")]
         public IActionResult Get(int id)
         {
-            var item = repository.Get(id);
+            Order item;
+
+            try
+            {
+                item = repository.Get(id);
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Something went wrong" + $"{ex.Message}");
+            }
+
             if (item == null)
             {
                 return NotFound();
@@ -91,11 +120,22 @@ namespace OrderApi.Controllers
         {
             var orderDtoList = new List<OrderDto>();
 
-            var orderList = repository.GetByCustomer(id);
+            IEnumerable<Order> orderList;
+
+            try
+            {
+                orderList = repository.GetByCustomer(id);
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Something went wrong" + $"{ex.Message}");
+            }
+
 
             if (orderList.Count() <= 0) return NotFound("No matching orders found");
 
-            foreach (var order in repository.GetByCustomer(id))
+            foreach (var order in orderList)
             {
                 var orderDto = OrderConverter.Convert(order);
                 orderDtoList.Add(orderDto);
@@ -140,7 +180,19 @@ namespace OrderApi.Controllers
 
                     // Create order.
                     order.Status = OrderStatus.completed;
-                    var newOrder = repository.Add(order);
+
+                    Order newOrder;
+
+                    try
+                    {
+                        newOrder = repository.Add(order);
+
+                    }
+                    catch (Exception ex)
+                    {
+                        return StatusCode(500, "Something went wrong" + $"{ex.Message}");
+                    }
+
                     var neworderDto = OrderConverter.Convert(newOrder);
 
                     // Publish OrderStatusChangedMessage. If this operation
@@ -188,26 +240,48 @@ namespace OrderApi.Controllers
         [HttpPut("{id}/cancel")]
         public IActionResult Cancel(int id)
         {
-            //Check if the order exists
-            var item = repository.Get(id);
-            if (item == null)
+
+            try
             {
-                return NotFound();
-            }
+                //Check if the order exists
+                var item = repository.Get(id);
 
-            if (item.Status == OrderStatus.cancelled)
+                if (item == null)
+                {
+                    return NotFound();
+                }
+
+                if (item.Status == OrderStatus.paid)
+                {
+                    return StatusCode(400, "Order already shipped");
+                }
+
+
+                if (item.Status == OrderStatus.shipped)
+                {
+                    return StatusCode(400, "Order already shipped");
+                }
+
+                if (item.Status == OrderStatus.cancelled)
+                {
+                    return StatusCode(400, "Order already cancelled");
+                }
+
+                item.Status = OrderStatus.cancelled;
+
+
+                repository.Edit(item);
+
+                // Publish OrderStatusChangedMessage
+                messagePublisher.PublishOrderStatusChangedMessage(
+                    item.CustomerId, OrderConverter.Convert(item).Orderlines, "cancelled");
+                return StatusCode(200, "Order cancelled");
+
+            }
+            catch (Exception ex)
             {
-                return StatusCode(400, "Order already cancelled");
+                return StatusCode(500, "Something went wrong" + $"{ex.Message}");
             }
-
-            item.Status = OrderStatus.cancelled;
-
-            repository.Edit(item);
-            // Publish OrderStatusChangedMessage
-            messagePublisher.PublishOrderStatusChangedMessage(
-                item.CustomerId, OrderConverter.Convert(item).Orderlines, "cancelled");
-            return StatusCode(200, "Order cancelled");
-
 
         }
 
@@ -217,25 +291,34 @@ namespace OrderApi.Controllers
         [HttpPut("{id}/ship")]
         public IActionResult Ship(int id)
         {
-            //Check if the order exists
-            var item = repository.Get(id);
-            if (item == null)
+            try
             {
-                return NotFound();
+                //Check if the order exists
+                var item = repository.Get(id);
+                if (item == null)
+                {
+                    return NotFound();
+                }
+
+                if (item.Status == OrderStatus.shipped)
+                {
+                    return StatusCode(400, "Order already shipped");
+                }
+
+                item.Status = OrderStatus.shipped;
+
+                repository.Edit(item);
+                // Publish OrderStatusChangedMessage
+                messagePublisher.PublishOrderStatusChangedMessage(
+                    item.CustomerId, OrderConverter.Convert(item).Orderlines, "shipped");
+                return StatusCode(200, "Order shipped");
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Something went wrong" + $"{ex.Message}");
             }
 
-            if (item.Status == OrderStatus.shipped)
-            {
-                return StatusCode(400, "Order already shipped");
-            }
-
-            item.Status = OrderStatus.shipped;
-
-            repository.Edit(item);
-            // Publish OrderStatusChangedMessage
-            messagePublisher.PublishOrderStatusChangedMessage(
-                item.CustomerId, OrderConverter.Convert(item).Orderlines, "shipped");
-            return StatusCode(200, "Order shipped");
         }
 
         // PUT orders/5/pay
@@ -244,37 +327,47 @@ namespace OrderApi.Controllers
         [HttpPut("{id}/pay")]
         public IActionResult Pay(int id)
         {
-            //Check if the order exists
-            var item = repository.Get(id);
-            if (item == null)
+            try
             {
-                return NotFound();
+                //Check if the order exists
+                var item = repository.Get(id);
+                if (item == null)
+                {
+                    return NotFound();
+                }
+
+                if (item.Status == OrderStatus.paid)
+                {
+                    return StatusCode(400, "Order already paid");
+                }
+
+                item.Status = OrderStatus.paid;
+
+                repository.Edit(item);
+
+                //Check if the customers credit standing has changed
+                //If it has changed, publish a CreditStandingChangedMessage
+
+                if (CreditStandingHasChanged(item.CustomerId))
+                {
+                    // Publish CreditStandingChangedMessage
+                    messagePublisher.PublishCreditStandingChangedMessage(item.CustomerId, true);
+                }
+
+                return StatusCode(200, "Order paid");
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Something went wrong" + $"{ex.Message}");
             }
 
-            if (item.Status == OrderStatus.paid)
-            {
-                return StatusCode(400, "Order already paid");
-            }
-
-            item.Status = OrderStatus.paid;
-
-            repository.Edit(item);
-
-            //Check if the customers credit standing has changed
-            //If it has changed, publish a CreditStandingChangedMessage
-
-            if (CreditStandingHasChanged(item.CustomerId))
-            {
-                // Publish CreditStandingChangedMessage
-                messagePublisher.PublishCreditStandingChangedMessage(item.CustomerId, true);
-            }
-
-            return StatusCode(200, "Order paid");
         }
 
         //Check if the customers credit standing has changed
         private bool CreditStandingHasChanged(int customerId)
         {
+
             //If any of the customers orders are shipped then that mens that the customer still has bad creadit standing
             //And so his credit standing has not changed
             return !repository.GetByCustomer(customerId).Any(o => o.Status == OrderStatus.shipped);
