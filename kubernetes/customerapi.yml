@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: customerapi
-        image: scupak/customerapi:v2
+        image: scupak/customerapi:latest
 ---
 apiVersion: v1
 kind: Service

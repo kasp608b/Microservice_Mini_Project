@@ -48,7 +48,7 @@ using (var scope = app.Services.CreateScope())
     dbInitializer.Initialize(dbContext);
 }
 // Create a message listener in a separate thread.
-Console.WriteLine("Started listening program");
+Console.WriteLine("Started listening program wow this should work");
 Task.Factory.StartNew(() =>
     new MessageListener(app.Services, cloudAMQPConnectionString).StartAsync());
 //app.UseHttpsRedirection();
