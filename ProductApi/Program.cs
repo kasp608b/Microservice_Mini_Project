@@ -14,7 +14,8 @@ string cloudAMQPConnectionString = "host=rabbitmq";
 
 // Add services to the container.
 
-builder.Services.AddDbContext<ProductApiContext>(opt => opt.UseInMemoryDatabase("ProductsDb"));
+//builder.Services.AddDbContext<ProductApiContext>(opt => opt.UseInMemoryDatabase("ProductsDb"));
+builder.Services.AddDbContext<ProductApiContext>(opt => opt.UseSqlServer(@"Server=LAPTOP-57BRPA77;Database=ProductsDb;Trusted_Connection=True;Trust Server Certificate=true;"));
 
 // Register repositories for dependency injection
 builder.Services.AddScoped<IRepository<Product>, ProductRepository>();
