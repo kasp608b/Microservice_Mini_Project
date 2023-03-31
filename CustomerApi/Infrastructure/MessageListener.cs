@@ -67,7 +67,7 @@ namespace CustomerApi.Infrastructure
 
         private void HandleOrderCancelled(OrderStatusChangedMessage message)
         {
-            Console.WriteLine("Handle order completed called");
+            Console.WriteLine("Handle order Cancelled called");
             using (var scope = provider.CreateScope())
             {
                 var services = scope.ServiceProvider;

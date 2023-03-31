@@ -66,7 +66,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Create a message listener in a separate thread.
-Console.WriteLine("Started listening program");
+Console.WriteLine("Started listening program version after push");
 Task.Factory.StartNew(() =>
     new MessageListener(app.Services, cloudAMQPConnectionString).Start());
 //app.UseHttpsRedirection();
