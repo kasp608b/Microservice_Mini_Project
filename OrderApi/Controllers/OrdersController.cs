@@ -144,6 +144,25 @@ namespace OrderApi.Controllers
 
         }
 
+        // GET orders/product/5
+        // This action method was provided to support request aggregate
+        // "Orders by product" in OnlineRetailerApiGateway.
+        [HttpGet("product/{id}", Name = "GetOrderByProduct")]
+        public IEnumerable<Order> GetByProduct(int id)
+        {
+            List<Order> ordersWithSpecificProduct = new List<Order>();
+
+            foreach (var order in repository.GetAll())
+            {
+                if (order.Orderlines.Where(o => o.ProductId == id).Any())
+                {
+                    ordersWithSpecificProduct.Add(order);
+                }
+            }
+
+            return ordersWithSpecificProduct;
+        }
+
         // POST orders
         [HttpPost]
         public IActionResult Post([FromBody] OrderDto orderDto)
