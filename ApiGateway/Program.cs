@@ -1,25 +1,30 @@
+using Ocelot.DependencyInjection;
+using Ocelot.Middleware;
+using Prometheus;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddRazorPages();
+builder.Configuration.AddJsonFile("ocelot-aggregation.json");
+
+builder.Services.AddOcelot();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
-}
+//app.UseHttpsRedirection();
 
-app.UseHttpsRedirection();
-app.UseStaticFiles();
+app.UseHttpMetrics();
 
+//app.MapMetrics(); //Doesn't work here for some unknown reason.
+// Do it the old way instead:
 app.UseRouting();
-
 app.UseAuthorization();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapMetrics();
+});
 
-app.MapRazorPages();
+app.UseOcelot().Wait();
 
 app.Run();
+
+
