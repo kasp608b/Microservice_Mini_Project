@@ -27,6 +27,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Kubernetes", "Kubernetes", 
 		kubernetes\rabbitmq.yml = kubernetes\rabbitmq.yml
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiGateway", "ApiGateway\ApiGateway.csproj", "{1848E707-E78D-4FF3-A8DB-271EED8F5749}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,6 +55,10 @@ Global
 		{913FAC46-6411-43DA-9420-4D7E3D76E1FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{913FAC46-6411-43DA-9420-4D7E3D76E1FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{913FAC46-6411-43DA-9420-4D7E3D76E1FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1848E707-E78D-4FF3-A8DB-271EED8F5749}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1848E707-E78D-4FF3-A8DB-271EED8F5749}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1848E707-E78D-4FF3-A8DB-271EED8F5749}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1848E707-E78D-4FF3-A8DB-271EED8F5749}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
