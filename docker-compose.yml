@@ -77,7 +77,6 @@ services:
     build:
       context: .
       dockerfile: ApiGateway/Dockerfile
-      
     ports:
       - "8080:80"
       - "7430:443"
