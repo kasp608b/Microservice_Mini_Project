@@ -1,0 +1,36 @@
+﻿{
+  "Routes": [
+
+    {
+      // ProductApi routes
+      "DownstreamPathTemplate": "/{catchAll}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "productapi",
+          "Port": 80
+        }
+      ],
+      "UpstreamPathTemplate": "/productapi/{catchAll}",
+      "UpstreamHttpMethod": [ "Get" ]
+    },
+
+    {
+      // OrderApi routes
+      "DownstreamPathTemplate": "/{catchAll}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "orderapi",
+          "Port": 80
+        }
+      ],
+      "UpstreamPathTemplate": "/orderapi/{catchAll}",
+      "UpstreamHttpMethod": [ "Get", "Post" ]
+    }
+  ],
+  // Global configuration
+  "GlobalConfiguration": {
+    "BaseUrl": "https://localhost:7430"
+  }
+}

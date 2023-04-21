@@ -1,4 +1,4 @@
-{
+﻿{
   "Routes": [
     {
       // ProductApi routes for aggregate: Orders and products
@@ -106,6 +106,6 @@
   ],
   // Global configuration
   "GlobalConfiguration": {
-    "BaseUrl": "https://localhost:7430"
+    "BaseUrl": "http://localhost:7430"
   }
 }
