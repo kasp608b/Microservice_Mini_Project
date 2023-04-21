@@ -13,3 +13,6 @@ scrape_configs:
   - job_name: 'orderapi'
     static_configs:
     - targets: ['orderapi:80']
+  - job_name: 'customerapi'
+    static_configs:
+    - targets: ['customerapi:80']

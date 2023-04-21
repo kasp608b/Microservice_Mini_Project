@@ -85,3 +85,15 @@ services:
       - "7430:443"
     volumes:
      - C:/Certs:/ro
+
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+
+  grafana: 
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
