@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using ProductApi.Data;
 using ProductApi.Infrastructure;
 using ProductApi.Models;
+using Prometheus;
 using SharedModels;
 
 
@@ -53,8 +54,13 @@ Task.Factory.StartNew(() =>
     new MessageListener(app.Services, cloudAMQPConnectionString).StartAsync());
 //app.UseHttpsRedirection();
 
+
+app.UseHttpMetrics();
+
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapMetrics();
 
 app.Run();
