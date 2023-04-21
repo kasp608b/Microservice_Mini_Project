@@ -2,6 +2,7 @@ using CustomerApi.Data;
 using CustomerApi.Infrastructure;
 using CustomerApi.Models;
 using Microsoft.EntityFrameworkCore;
+using Prometheus;
 using SharedModels;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -73,8 +74,12 @@ Task.Factory.StartNew(() =>
 
 //app.UseHttpsRedirection();
 
+app.UseHttpMetrics();
+
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapMetrics();
 
 app.Run();
