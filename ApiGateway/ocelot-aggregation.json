@@ -83,6 +83,19 @@
       ],
       "UpstreamPathTemplate": "/orderapi/{catchAll}",
       "UpstreamHttpMethod": [ "Get", "Post" ]
+    },
+    {
+      // Other customerapi routes
+      "DownstreamPathTemplate": "/{catchAll}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "customerapi",
+          "Port": 80
+        }
+      ],
+      "UpstreamPathTemplate": "/customerapi/{catchAll}",
+      "UpstreamHttpMethod": [ "Get", "Post", "Delete","Put" ]
     }
   ],
   // Aggregates:
